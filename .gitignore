@@ -71,7 +71,8 @@ StyleCopReport.xml
 *.obj
 
 # Загружать файлы моделей
-!Coursework/models/**/*.obj
+!*/models/**/*.obj
+!**/models/**/*.obj
 
 *.iobj
 *.pch

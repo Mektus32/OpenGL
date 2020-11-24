@@ -10,6 +10,7 @@
 
 #include "shader.h"
 #include "camera.h"
+#include "model.h"
 #include "functions.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -30,7 +31,7 @@ float lastFrame = 0.0f;
 
 
 int main() {
-    system("echo %cd%");
+    //system("echo %cd%");
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -127,6 +128,15 @@ int main() {
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
+    Shader ringShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
+    Model ringModel("models/ring/rings.obj");
+
+    Shader planeShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
+    Model planeModel("models/plane/plane.obj");
+
+    Shader helShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
+    Model helModel("models/helicopter/hel.obj");
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
@@ -138,9 +148,40 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 model = glm::mat4(1.0f);
+        
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 model = glm::mat4(1.0f);
+
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -10.0f, 0.0f)); // смещаем вниз чтобы быть в центре сцены
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// объект слишком большой для нашей сцены, поэтому немного уменьшим его
+        planeShader.use();
+        planeShader.setMat4("projection", projection);
+        planeShader.setMat4("view", view);
+        planeShader.setMat4("model", model);
+        planeModel.Draw(planeShader);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -10.0f, 0.0f)); // смещаем вниз чтобы быть в центре сцены
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// объект слишком большой для нашей сцены, поэтому немного уменьшим его
+        ringShader.use();
+        ringShader.setMat4("projection", projection);
+        ringShader.setMat4("view", view);
+        ringShader.setMat4("model", model);
+        ringModel.Draw(ringShader);
+
+        
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, camera.Position + (camera.Front * glm::vec3(2.0f, 2.0f, 2.0f))); // смещаем вниз чтобы быть в центре сцены
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// объект слишком большой для нашей сцены, поэтому немного уменьшим его
+        helShader.use();
+        helShader.setMat4("projection", projection);
+        helShader.setMat4("view", view);
+        helShader.setMat4("model", model);
+        helModel.Draw(helShader);
+
         glDepthFunc(GL_LEQUAL);  
         skyboxShader.use();
         view = glm::mat4(glm::mat3(camera.GetViewMatrix()));

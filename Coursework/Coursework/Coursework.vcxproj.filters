@@ -52,5 +52,11 @@
     <None Include="shaders\skybox\skybox.vs">
       <Filter>Файлы ресурсов</Filter>
     </None>
+    <None Include="shaders\ring\ring.fs">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="shaders\ring\ring.vs">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
 </Project>
