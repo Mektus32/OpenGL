@@ -18,7 +18,7 @@ enum Camera_Movement {
 // Параметры камеры по умолчанию
 const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
-const float SPEED       =  2.5f;
+const float SPEED       =  5.0f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  45.0f;
 
@@ -85,6 +85,17 @@ public:
     {
         xoffset *= MouseSensitivity;
         yoffset *= MouseSensitivity;
+
+        /*float critical_value = 0.1f;
+
+        if (xoffset > critical_value)
+            xoffset = critical_value;
+        if (xoffset < -critical_value)
+            xoffset = -critical_value;
+        if (yoffset > critical_value)
+            yoffset = critical_value;
+        if (yoffset < -critical_value)
+            yoffset = -critical_value;*/
 
         Yaw   += xoffset;
         Pitch += yoffset;

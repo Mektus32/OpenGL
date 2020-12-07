@@ -32,6 +32,8 @@ public:
     string directory;
     bool gammaCorrection;
 
+    Model() = default;
+
     // конструктор, в качестве аргумента использует пусть до 3d-модели
     Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
     {
@@ -39,7 +41,7 @@ public:
     }
 
     // отрисовывает модель, а значит и все её меши
-    void Draw(Shader shader)
+    void Draw(Shader shader) const
     {
         for(unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);

@@ -12,22 +12,32 @@
 #include "camera.h"
 #include "model.h"
 #include "functions.h"
+#include "player.h"
+#include "rockets.h"
+#include "objects.h"
+#include "texture.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
+void mouseKey(GLFWwindow* window, int button, int action, int mode);
+void collision(std::vector<Objects>& scene_objects, std::vector<Rockets>& rockets);
+Texture2D loadTextureFromFile(const char* file, bool alpha);
 
-const unsigned int SCR_WIDTH = 600;
-const unsigned int SCR_HEIGHT = 400;
+const unsigned int SCR_WIDTH = 1200;
+const unsigned int SCR_HEIGHT = 800;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 10.0f, 3.0f));
 float lastX = (float)SCR_WIDTH / 2.0;
 float lastY = (float)SCR_HEIGHT / 2.0;
 bool firstMouse = true;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+
+std::vector<Rockets> rockets;
 
 
 int main() {
@@ -37,7 +47,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL for Ravesli.com!", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "CourseWork", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -48,6 +58,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetMouseButtonCallback(window, mouseKey);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -123,19 +134,66 @@ int main() {
         "textures/skybox/front.jpg",
         "textures/skybox/back.jpg"
     };
+
     unsigned int cubemapTexture = loadCubemap(faces);
 
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
     Shader ringShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
-    Model ringModel("models/ring/rings.obj");
+    Model cubeModel("models/test/test.obj");
 
     Shader planeShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
     Model planeModel("models/plane/plane.obj");
 
+
     Shader helShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
     Model helModel("models/helicopter/hel.obj");
+
+    Shader rocketShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
+    Model rocketModel("models/rocket/rocket.obj");
+
+    Objects plane(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(100.0f, 0.0f, 100.0f),
+        glm::vec3(-100.0f, 0.0f, -100.0f),
+        planeModel, planeShader, false
+    );
+
+    std::vector<glm::vec3> target_positions{
+        glm::vec3(0.0f, 5.0f, 0.0f),
+        glm::vec3(1.0f, 5.0f, 1.0f),
+        glm::vec3(2.0f, 5.0f, 2.0f),
+        glm::vec3(3.0f, 5.0f, 3.0f),
+        glm::vec3(4.0f, 5.0f, 4.0f),
+        glm::vec3(5.0f, 5.0f, 5.0f)
+    };
+
+    Objects cube(
+        glm::vec3(10.0f, 5.0f, 10.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(-1.0f, -1.0f, -1.0f),
+        cubeModel, ringShader, true
+    );
+
+    Player player(
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(-0.5f, -0.5f, -0.5f),
+        helModel, helShader
+    );
+
+    std::vector<Objects> scene_objects;
+    scene_objects.push_back(plane);
+    for (const auto& pos : target_positions) {
+        Objects cube(
+            pos,
+            glm::vec3(1.0f, 1.0f, 1.0f),
+            glm::vec3(-1.0f, -1.0f, -1.0f),
+            cubeModel, ringShader, true
+        );
+
+        scene_objects.push_back(cube);
+    }
 
     while (!glfwWindowShouldClose(window))
     {
@@ -154,33 +212,28 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
 
 
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -10.0f, 0.0f)); // смещаем вниз чтобы быть в центре сцены
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// объект слишком большой дл€ нашей сцены, поэтому немного уменьшим его
-        planeShader.use();
-        planeShader.setMat4("projection", projection);
-        planeShader.setMat4("view", view);
-        planeShader.setMat4("model", model);
-        planeModel.Draw(planeShader);
-
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -10.0f, 0.0f)); // смещаем вниз чтобы быть в центре сцены
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// объект слишком большой дл€ нашей сцены, поэтому немного уменьшим его
-        ringShader.use();
-        ringShader.setMat4("projection", projection);
-        ringShader.setMat4("view", view);
-        ringShader.setMat4("model", model);
-        ringModel.Draw(ringShader);
-
+        for (const auto& object : scene_objects) {
+            object.Draw(view, projection);
+        }
         
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, camera.Position + (camera.Front * glm::vec3(2.0f, 2.0f, 2.0f))); // смещаем вниз чтобы быть в центре сцены
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// объект слишком большой дл€ нашей сцены, поэтому немного уменьшим его
-        helShader.use();
-        helShader.setMat4("projection", projection);
-        helShader.setMat4("view", view);
-        helShader.setMat4("model", model);
-        helModel.Draw(helShader);
+        for (auto& rocket : rockets) {
+            rocket.Draw(view, projection, rocketModel, rocketShader, deltaTime);
+        }
+
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+        player.Draw(view, projection, camera);
+
+        collision(scene_objects, rockets);
+        player_collision(scene_objects, player);
+        if (player.lives < 0) {
+            glfwSetWindowShouldClose(window, true);
+            std::cout << "Game Over!" << std::endl;
+        }
+
+        if (scene_objects.size() == 1) {
+            glfwSetWindowShouldClose(window, true);
+            std::cout << "You Won!" << std::endl;
+        }
 
         glDepthFunc(GL_LEQUAL);  
         skyboxShader.use();
@@ -212,14 +265,14 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+   /* if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);*/
+    /*if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        camera.ProcessKeyboard(RIGHT, deltaTime);*/
 }
 
 // glfw: вс€кий раз, когда измен€ютс€ размеры окна (пользователем или опер. системой), вызываетс€ данна€ функци€
@@ -256,4 +309,58 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
+}
+
+void mouseKey(GLFWwindow* window, int button, int action, int mode)
+{
+    if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
+        glm::vec3 rocket_pos = camera.Position + (camera.Front * glm::vec3(2.0f, 2.0f, 2.0f));
+        Rockets rocket(
+            rocket_pos,
+            glm::vec3(1.0f, 1.0f, 1.0f),
+            glm::vec3(-1.0f, -1.0f, -1.0f),
+            camera.Front,
+            camera.Yaw,
+            camera.Pitch
+        );
+        rockets.push_back(rocket);
+    }
+}
+
+void collision(std::vector<Objects>& scene_objects, std::vector<Rockets>& rockets) {
+    for (auto it_obj = scene_objects.begin(); it_obj != scene_objects.end();) {
+        bool update = true;
+        for (auto it_rock = rockets.begin(); it_rock != rockets.end(); ++it_rock) {
+            if (it_rock->is_collision(*it_obj)) {
+                if (it_obj->is_destroyed) {
+                    it_obj = scene_objects.erase(it_obj);
+                    update = false;
+                }
+                it_rock = rockets.erase(it_rock);
+                break;
+            }
+        }
+        if (update) {
+            ++it_obj;
+        }
+    }
+}
+
+Texture2D loadTextureFromFile(const char* file, bool alpha)
+{
+    // создаем объект текстуры
+    Texture2D texture;
+    if (alpha)
+    {
+        texture.Internal_Format = GL_RGBA;
+        texture.Image_Format = GL_RGBA;
+    }
+    // загружаем изображение
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
+    // теперь генерируем текстуру
+    texture.Generate(width, height, data);
+    // и в конце освобождаем ресурсы
+    stbi_image_free(data);
+    return texture;
 }

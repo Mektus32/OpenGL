@@ -22,16 +22,23 @@
     <ClCompile Include="source\glad.c" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\stb_image.cpp" />
+    <ClCompile Include="source\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\functions.h" />
     <ClInclude Include="include\mesh.h" />
     <ClInclude Include="include\model.h" />
+    <ClInclude Include="include\objects.h" />
+    <ClInclude Include="include\player.h" />
+    <ClInclude Include="include\rockets.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\stb_image.h" />
+    <ClInclude Include="include\texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\particles\particles.fs" />
+    <None Include="shaders\particles\particles.vs" />
     <None Include="shaders\ring\ring.fs" />
     <None Include="shaders\ring\ring.vs" />
     <None Include="shaders\skybox\skybox.fs" />
@@ -100,11 +107,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\mtara\Desktop\OpenGL\Coursework\Coursework\include;C:\Users\mtara\Desktop\OpenGL\OpenGL_extern_include_and_lib\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\mtara\Desktop\OpenGL\OpenGL_extern_include_and_lib\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\..\Coursework\Coursework\include;..\..\..\OpenGL_extern_include_and_lib\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\..\OpenGL_extern_include_and_lib\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\mtara\Desktop\OpenGL\OpenGL_extern_include_and_lib\Include;C:\Users\mtara\Desktop\OpenGL\Coursework\Coursework\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\mtara\Desktop\OpenGL\OpenGL_extern_include_and_lib\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -162,6 +171,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

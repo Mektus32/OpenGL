@@ -56,7 +56,7 @@ public:
     }
 
     // Рендеринг mesh-а
-    void Draw(Shader& shader)
+    void Draw(Shader& shader) const
     {
         // Связываем соответствующие текстуры
         unsigned int diffuseNr = 1;
