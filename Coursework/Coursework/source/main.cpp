@@ -140,59 +140,58 @@ int main() {
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
-    Shader ringShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
-    Model cubeModel("models/test/test.obj");
+    Shader evilShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
+    Model evilModel("models/evil/evil.obj");
 
-    Shader planeShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
-    Model planeModel("models/plane/plane.obj");
+    /*Shader planeShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
+    Model planeModel("models/plane/plane.obj");*/
 
 
-    Shader helShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
-    Model helModel("models/helicopter/hel.obj");
+    Shader playerShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
+    Model playerModel("models/player/player.obj");
 
     Shader rocketShader("shaders/ring/ring.vs", "shaders/ring/ring.fs");
     Model rocketModel("models/rocket/rocket.obj");
 
-    Objects plane(
+    /*Objects plane(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(100.0f, 0.0f, 100.0f),
         glm::vec3(-100.0f, 0.0f, -100.0f),
         planeModel, planeShader, false
-    );
+    );*/
 
     std::vector<glm::vec3> target_positions{
         glm::vec3(0.0f, 5.0f, 0.0f),
-        glm::vec3(1.0f, 5.0f, 1.0f),
-        glm::vec3(2.0f, 5.0f, 2.0f),
-        glm::vec3(3.0f, 5.0f, 3.0f),
-        glm::vec3(4.0f, 5.0f, 4.0f),
-        glm::vec3(5.0f, 5.0f, 5.0f)
+        glm::vec3(10.0f, 10.0f, 10.0f),
+        glm::vec3(-10.0f, -10.0f, -10.0f),
+        glm::vec3(10.0f, 10.0f, -10.0f),
+        glm::vec3(-10.0f, 10.0f, 10.0f),
+        glm::vec3(-10.0f, -10.0f, 10.0f)
     };
 
     Objects cube(
         glm::vec3(10.0f, 5.0f, 10.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec3(-1.0f, -1.0f, -1.0f),
-        cubeModel, ringShader, true
+        evilModel, evilShader, true
     );
 
     Player player(
         glm::vec3(0.5f, 0.5f, 0.5f),
         glm::vec3(-0.5f, -0.5f, -0.5f),
-        helModel, helShader
+        playerModel, playerShader
     );
 
     std::vector<Objects> scene_objects;
-    scene_objects.push_back(plane);
+    //scene_objects.push_back(plane);
     for (const auto& pos : target_positions) {
-        Objects cube(
+        Objects evil(
             pos,
-            glm::vec3(1.0f, 1.0f, 1.0f),
-            glm::vec3(-1.0f, -1.0f, -1.0f),
-            cubeModel, ringShader, true
+            glm::vec3(0.146f, 0.146f, 0.146f),
+            glm::vec3(-0.146f, -0.146f, -0.146f),
+            evilModel, evilShader, true
         );
-
-        scene_objects.push_back(cube);
+        scene_objects.push_back(evil);
     }
 
     while (!glfwWindowShouldClose(window))
@@ -208,7 +207,7 @@ int main() {
 
         
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
         glm::mat4 model = glm::mat4(1.0f);
 
 
@@ -317,8 +316,8 @@ void mouseKey(GLFWwindow* window, int button, int action, int mode)
         glm::vec3 rocket_pos = camera.Position + (camera.Front * glm::vec3(2.0f, 2.0f, 2.0f));
         Rockets rocket(
             rocket_pos,
-            glm::vec3(1.0f, 1.0f, 1.0f),
-            glm::vec3(-1.0f, -1.0f, -1.0f),
+            glm::vec3(0.36f, 0.36f, 0.36f),
+            glm::vec3(-0.36f, -0.36f, -0.36f),
             camera.Front,
             camera.Yaw,
             camera.Pitch
