@@ -22,7 +22,6 @@
     <ClCompile Include="source\glad.c" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\stb_image.cpp" />
-    <ClCompile Include="source\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
@@ -34,11 +33,8 @@
     <ClInclude Include="include\rockets.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\stb_image.h" />
-    <ClInclude Include="include\texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\particles\particles.fs" />
-    <None Include="shaders\particles\particles.vs" />
     <None Include="shaders\ring\ring.fs" />
     <None Include="shaders\ring\ring.vs" />
     <None Include="shaders\skybox\skybox.fs" />

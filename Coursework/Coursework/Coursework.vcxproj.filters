@@ -24,9 +24,6 @@
     <ClCompile Include="source\stb_image.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\texture.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h">
@@ -56,9 +53,6 @@
     <ClInclude Include="include\player.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="include\texture.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\skybox\skybox.fs">
@@ -71,12 +65,6 @@
       <Filter>Файлы ресурсов</Filter>
     </None>
     <None Include="shaders\ring\ring.vs">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="shaders\particles\particles.fs">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="shaders\particles\particles.vs">
       <Filter>Файлы ресурсов</Filter>
     </None>
   </ItemGroup>
