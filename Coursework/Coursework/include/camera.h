@@ -57,9 +57,9 @@ public:
         return glm::lookAt(Position, Position + Front, Up);
     }
 
-   void ProcessKeyboard(Camera_Movement direction, float deltaTime)
+   void ProcessKeyboard(Camera_Movement direction, float deltaTime, float speed = 1)
     {
-        float velocity = MovementSpeed * deltaTime;
+        float velocity = MovementSpeed * deltaTime * speed;
         if (direction == FORWARD)
             Position += Front * velocity;
         if (direction == BACKWARD)

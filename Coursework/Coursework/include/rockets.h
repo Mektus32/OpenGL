@@ -8,7 +8,7 @@
 
 class Rockets : public Objects {
 public:
-	Rockets(glm::vec3& position, const glm::vec3& top, const glm::vec3& bottom, const glm::vec3& font, float yawl, float pitch, bool is_destroyed = true);
+	Rockets(glm::vec3& position, const glm::vec3& top, const glm::vec3& bottom, const glm::vec3& font, float yawl, float pitch, float speed, bool is_destroyed = true);
 
 	void Draw(const glm::mat4& view, const glm::mat4& projection, const Model& model_obj, const Shader& shader, float delta_time);
 
@@ -19,8 +19,8 @@ private:
 	float pitch;
 };
 
-Rockets::Rockets(glm::vec3& position, const glm::vec3& top, const glm::vec3& bottom, const glm::vec3& font, float yawl, float pitch, bool is_destroyed)
-	: Objects(position, top, bottom, Model(), Shader(), is_destroyed), font(font), yawl(yawl), pitch(pitch), speed(10.0f)
+Rockets::Rockets(glm::vec3& position, const glm::vec3& top, const glm::vec3& bottom, const glm::vec3& font, float yawl, float pitch, float speed, bool is_destroyed)
+	: Objects(position, top, bottom, Model(), Shader(), is_destroyed), font(font), yawl(yawl), pitch(pitch), speed(speed)
 {
 
 }
@@ -29,6 +29,9 @@ void Rockets::Draw(const glm::mat4& view, const glm::mat4& projection, const Mod
 	shader.use();
 	shader.setMat4("view", view);
 	shader.setMat4("projection", projection);
+
+	
+
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::vec3 new_pos = position + font * glm::vec3(speed * delta_time, speed * delta_time, speed * delta_time);
 	model = glm::translate(model, new_pos);

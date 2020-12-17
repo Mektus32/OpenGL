@@ -15,6 +15,7 @@
 #include "player.h"
 #include "rockets.h"
 #include "objects.h"
+//#include "evil.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -33,6 +34,10 @@ bool firstMouse = true;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+float horizontal_angle = 0.0f;
+float vertical_angle = 0.0f;
+float player_speed = 0.0f;
 
 
 std::vector<Rockets> rockets;
@@ -166,12 +171,12 @@ int main() {
         glm::vec3(-10.0f, -10.0f, 10.0f)
     };
 
-    Objects cube(
+    /*Objects cube(
         glm::vec3(10.0f, 5.0f, 10.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec3(-1.0f, -1.0f, -1.0f),
         evilModel, evilShader, true
-    );
+    );*/
 
     Player player(
         glm::vec3(0.5f, 0.5f, 0.5f),
@@ -179,7 +184,7 @@ int main() {
         playerModel, playerShader
     );
 
-    std::vector<Objects> scene_objects;
+    std::vector<Objects> scene_evil;
     //scene_objects.push_back(plane);
     for (const auto& pos : target_positions) {
         Objects evil(
@@ -188,7 +193,7 @@ int main() {
             glm::vec3(-0.146f, -0.146f, -0.146f),
             evilModel, evilShader, true
         );
-        scene_objects.push_back(evil);
+        scene_evil.push_back(evil);
     }
 
     while (!glfwWindowShouldClose(window))
@@ -208,25 +213,30 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
 
 
-        for (const auto& object : scene_objects) {
-            object.Draw(view, projection);
+        for (auto& object : scene_evil) {
+            object.Draw(view, projection, deltaTime);
         }
         
         for (auto& rocket : rockets) {
             rocket.Draw(view, projection, rocketModel, rocketShader, deltaTime);
         }
 
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-        player.Draw(view, projection, camera);
+        camera.ProcessKeyboard(FORWARD, deltaTime, player_speed);
+        player.Draw(view, projection, camera, horizontal_angle, vertical_angle);
+        horizontal_angle = 0.0f;
+        vertical_angle = 0.0f;
+        player_speed = 1.0f;
 
-        collision(scene_objects, rockets);
-        player_collision(scene_objects, player);
+
+        collision(scene_evil, rockets);
+        player_collision(scene_evil, player);
+        
         if (player.lives < 0) {
             glfwSetWindowShouldClose(window, true);
             std::cout << "Game Over!" << std::endl;
         }
 
-        if (scene_objects.size() == 1) {
+        if (scene_evil.size() == 0) {
             glfwSetWindowShouldClose(window, true);
             std::cout << "You Won!" << std::endl;
         }
@@ -254,21 +264,35 @@ int main() {
     return 0;
 }
 
-
-
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-   /* if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);*/
-    /*if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);*/
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        player_speed += 2;
+    }
+
+    float xoffset = 0;
+    float yoffset = 0;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        vertical_angle = 20;
+        yoffset = 0.75;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        vertical_angle = -20;
+        yoffset = -0.75;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        horizontal_angle = -20;
+        xoffset = -0.75;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        horizontal_angle = 20;
+        xoffset = 0.75;
+    }
+    camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -288,10 +312,24 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; 
 
+    //if (yoffset > 0)
+    //    vertical_angle = 20;
+    //else if (yoffset < 0)
+    //    vertical_angle = -20;
+    //else
+    //    vertical_angle = 0;
+
+    //if (xoffset > 0)
+    //    horizontal_angle = 20;
+    //else if (xoffset < 0)
+    //    horizontal_angle = -20;
+    //else
+    //    horizontal_angle = 0;
+
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    //camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -309,7 +347,8 @@ void mouseKey(GLFWwindow* window, int button, int action, int mode)
             glm::vec3(-0.36f, -0.36f, -0.36f),
             camera.Front,
             camera.Yaw,
-            camera.Pitch
+            camera.Pitch,
+            player_speed * 15
         );
         rockets.push_back(rocket);
     }
