@@ -106,8 +106,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\..\Coursework\Coursework\include;..\..\..\OpenGL_extern_include_and_lib\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\..\OpenGL_extern_include_and_lib\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Coursework\include;$(SolutionDir)..\OpenGL_extern_include_and_lib\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\OpenGL_extern_include_and_lib\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
